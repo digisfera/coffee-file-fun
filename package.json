@@ -1,0 +1,25 @@
+{
+  "name": "coffee-fun",
+  "version": "0.0.0",
+  "description": "Wrapper functions for the Coffeescript compiler",
+  "main": "coffee-fun.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "coffee",
+    "compiler",
+    "coffeescript"
+  ],
+  "author": "Manuel Cabral (m.cabral@digisfera.pt)",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "coffee-script": "~1.6.3"
+  },
+  "devDependencies": {
+    "chai": "~1.8.1",
+    "mocha": "~1.17.0",
+    "mkdirp": "~0.3.5",
+    "rimraf": "~2.2.5"
+  }
+}
