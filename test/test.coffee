@@ -139,7 +139,46 @@ describe 'coffee-fun', ->
         done()    
 
   describe 'globsToDir', ->
-    it 'compiles a glob to a folder'
-    it 'compiles globs to a folder'
-    it 'compiles a list of files to a folder'
-    it 'appends .js extension to files'
+
+    it 'compiles a glob to a folder and append extension', (done) ->
+      globIn = path.join(__dirname, 'tmp', '*.coffee')
+      outputFolder = path.join(__dirname, 'tmp', 'globsToDir')
+      
+      expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
+      expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
+
+      coffeeFun.globsToDir globIn, outputFolder, null, (err, result) ->
+        expect(err).to.be.not.ok
+        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
+        done()
+
+    it 'compiles globs to a folder', (done) ->
+      globIn = path.join(__dirname, 'tmp', '*Compile.coffee')
+      globIn2 = path.join(__dirname, 'tmp', '*2.coffee')
+      outputFolder = path.join(__dirname, 'tmp', 'globsToDir2')
+
+      expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
+      expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
+
+      coffeeFun.globsToDir [ globIn, globIn2 ], outputFolder, null, (err, result) ->
+        expect(err).to.be.not.ok
+        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
+        done()    
+
+
+    it 'compiles a list of files to a folder', (done) ->
+      outputFolder = path.join(__dirname, 'tmp', 'globsToDir3')
+
+      expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
+      expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
+
+      coffeeFun.globsToDir [ toCompileFile, toCompileFile2 ], outputFolder, null, (err, result) ->
+        expect(err).to.be.not.ok
+        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
+        done()    

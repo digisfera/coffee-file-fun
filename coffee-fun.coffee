@@ -8,3 +8,4 @@ exports.fileToString = haveFun.stringToReadFile(exports.stringToString)
 
 exports.globsToStrings = haveFun.readFilesToGlobs(haveFun.singleToArray(exports.fileToString))
 exports.globsToFiles = haveFun.readFilesToGlobs(haveFun.argToGeneratedOptional(haveFun.singleToArray(exports.fileToFile, [0, 1]), 1, 0, true))
+exports.globsToDir = haveFun.readFilesToGlobs(haveFun.singleToArray(haveFun.filePathToDirPath(haveFun.appendExtension(exports.fileToFile, 'js')), 0))
