@@ -30,6 +30,7 @@ describe 'coffee-fun', ->
         expect(result).to.equal(compiled)
         done()
 
+  ### Not being exported afterall
   describe 'stringToFile', ->
     it 'compiles a string to a file', (done) ->
       outFile = path.join(__dirname,'tmp', 'stringToFile.js')
@@ -37,7 +38,8 @@ describe 'coffee-fun', ->
         expect(err).to.be.not.ok
         expect(result).to.equal(outFile)
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
-        done()      
+        done()
+  ###
 
   describe 'fileToFile', ->
     it 'compiles a file to a file', (done) ->
@@ -48,14 +50,28 @@ describe 'coffee-fun', ->
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
         done()
 
+  describe 'fileToDir', ->
+    it 'compiles a file to a directory', (done) ->
+      outDir = path.join(__dirname,'tmp','fileToDir')
+      expectedOutFile = path.join(outDir, 'toCompile.coffee.js')
 
+      coffeeFun.fileToDir toCompileFile, outDir, null, (err, result) ->
+        expect(err).to.be.not.ok
+        expect(result).to.equal(expectedOutFile)
+        expect(fs.readFileSync(expectedOutFile, { encoding: 'utf-8'})).to.equal(compiled)
+        done()
+
+
+  ### Not being exported afterall
   describe 'fileToString', ->
     it 'compiles a file to a string', (done) ->
       coffeeFun.fileToString toCompileFile, null, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.equal(compiled)
         done()
+  ###
 
+  ### Not being exported afterall
   describe 'globsToStrings', ->
     it 'compiles a list of files to strings', (done) ->
       coffeeFun.globsToStrings [ toCompileFile, toCompileFile2 ], null, (err, result) ->
@@ -85,6 +101,7 @@ describe 'coffee-fun', ->
         expect(err).to.be.not.ok
         expect(result).to.eql([ compiled, compiled2 ])
         done()
+  ###
 
   describe 'globsToFiles', ->
     it 'compiles globs to a filelist', (done) ->
