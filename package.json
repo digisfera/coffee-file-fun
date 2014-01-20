@@ -1,6 +1,6 @@
 {
   "name": "coffee-file-fun",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Wrapper functions for the Coffeescript compiler",
   "main": "coffee-file-fun.js",
   "scripts": {
