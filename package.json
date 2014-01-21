@@ -4,8 +4,7 @@
   "description": "Wrapper functions for the Coffeescript compiler",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "coffee -c coffee-file-fun.coffee"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "coffee",
