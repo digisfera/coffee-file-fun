@@ -4,7 +4,7 @@ mkdirp = require('mkdirp')
 rimraf = require('rimraf')
 coffee = require('coffee-script')
 fs = require('fs')
-coffeeFun = require("../coffee-fun")
+coffeeFun = require("../index")
 
 describe 'coffee-fun', ->
 

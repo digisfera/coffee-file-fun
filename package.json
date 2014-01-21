@@ -2,7 +2,7 @@
   "name": "coffee-file-fun",
   "version": "0.0.1",
   "description": "Wrapper functions for the Coffeescript compiler",
-  "main": "coffee-file-fun.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "coffee -c coffee-file-fun.coffee"
@@ -17,10 +17,10 @@
   "author": "Manuel Cabral (m.cabral@digisfera.pt)",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "coffee-script": "~1.6.3",
     "file-fun": "*"
   },
   "devDependencies": {
-    "coffee-script": "~1.6.3",
     "chai": "~1.8.1",
     "mocha": "~1.17.0",
     "mkdirp": "~0.3.5",
