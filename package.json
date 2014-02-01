@@ -17,7 +17,9 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "coffee-script": "~1.6.3",
-    "file-fun": "*"
+    "file-fun": "*",
+    "lodash": "~2.4.1",
+    "mkdirp": "~0.3.5"
   },
   "devDependencies": {
     "chai": "~1.8.1",
@@ -25,7 +27,7 @@
     "mkdirp": "~0.3.5",
     "rimraf": "~2.2.5"
   },
-  "repository":   {
+  "repository": {
     "type": "git",
     "url": "git://github.com/digisfera/coffee-file-fun.git"
   }

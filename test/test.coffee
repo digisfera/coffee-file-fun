@@ -32,142 +32,40 @@ describe 'coffee-fun', ->
       done()
 
 
-  describe 'async', ->
-    it 'compiles a string to a string', (done) ->
-      coffeeFun.async toCompile, null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.equal(compiled)
-        done()
-
-  ### Not being exported afterall
-  describe 'stringToFile', ->
-    it 'compiles a string to a file', (done) ->
-      outFile = path.join(__dirname,'tmp', 'stringToFile.js')
-      coffeeFun.stringToFile toCompile, outFile, null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.equal(outFile)
-        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
-        done()
-  ###
-
   describe 'fileToFile', ->
     it 'compiles a file to a file', (done) ->
       outFile = path.join(__dirname,'tmp', 'fileToFile.js')
-      coffeeFun.fileToFile toCompileFile, outFile, null, (err, result) ->
+      coffeeFun.file toCompileFile, outFile, null, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.equal(outFile)
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
         done()
 
-  ### Not being exported afterall
-  describe 'fileToDir', ->
-    it 'compiles a file to a directory', (done) ->
-      outDir = path.join(__dirname,'tmp','fileToDir')
-      expectedOutFile = path.join(outDir, 'toCompile.coffee.js')
-
-      coffeeFun.fileToDir { cwd: basePath, path: toCompileFileRelative }, outDir, null, (err, result) ->
+    it 'generates a source map', (done) ->
+      outFile = path.join(__dirname,'tmp', 'fileToFile2.js')
+      outSourceMap = path.join(__dirname,'tmp', 'fileToFile2.js.map')
+      coffeeFun.file toCompileFile, outFile, { sourceMap: true }, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.equal(expectedOutFile)
-        expect(fs.readFileSync(expectedOutFile, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(result).to.eql([ outFile, outSourceMap ])
+        #expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
+        expect(fs.readFileSync(outSourceMap, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
         done()
 
-
-  describe 'fileToString', ->
-    it 'compiles a file to a string', (done) ->
-      coffeeFun.fileToString toCompileFile, null, (err, result) ->
+    it 'generates source map with paths using "/"', (done) ->
+      outFile = path.join(__dirname,'tmp', 'built', 'fileToFile2.js')
+      outSourceMap = path.join(__dirname,'tmp', 'built', 'map', 'fileToFile2.js.map')
+      coffeeFun.file toCompileFile, outFile, { sourceMap: outSourceMap }, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.equal(compiled)
-        done()
-  ###
-
-  ### Not being exported afterall
-  describe 'globsToStrings', ->
-    it 'compiles a list of files to strings', (done) ->
-      coffeeFun.globsToStrings [ toCompileFile, toCompileFile2 ], null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ compiled, compiled2 ])
+        expect(result).to.eql([ outFile, outSourceMap ])
+        #expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
+        expect(fs.readFileSync(outSourceMap, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
+        #TODO: check paths
         done()
 
-    it 'compiles a glob to strings', (done) ->
-      globIn = path.join(__dirname, 'tmp', '*.coffee')
-      coffeeFun.globsToStrings globIn, null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ compiled, compiled2 ])
-        done()
+    it 'should work without `options` argument'
 
-    it 'compiles globs to strings', (done) ->
-      globIn = path.join(__dirname, 'tmp', '*Compile.coffee')
-      globIn2 = path.join(__dirname, 'tmp', '*2.coffee')
-      coffeeFun.globsToStrings [ globIn, globIn2 ], null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ compiled, compiled2 ])
-        done()
-
-    it 'does not compile file twice if it is matched on two globs', (done) ->
-      globIn = path.join(__dirname, 'tmp', '*Compile.coffee')
-      globIn2 = path.join(__dirname, 'tmp', '*.coffee')
-      coffeeFun.globsToStrings [ globIn, globIn2 ], null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ compiled, compiled2 ])
-        done()
-
-  describe 'filesToFiles', ->
-    it 'compiles files to a filelist', (done) ->
-      outFile1 = path.join(__dirname,'tmp', 'globToFiles1.js')
-      outFile2 = path.join(__dirname,'tmp', 'globToFiles2.js')
-
-      coffeeFun.filesToFiles [ toCompileFile, toCompileFile2 ], [ outFile1, outFile2 ], null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ outFile1, outFile2 ])
-        expect(fs.readFileSync(outFile1, { encoding: 'utf-8'})).to.equal(compiled)
-        expect(fs.readFileSync(outFile2, { encoding: 'utf-8'})).to.equal(compiled2)
-        done()    
-
-    it 'compiles files to a generated filelist', (done) ->
-      generateOutfile = (inFile) -> "#{inFile}.globToFiles.js"
-      expectedOutFile1 = path.join(__dirname,'tmp', 'toCompile.coffee.globToFiles.js')
-      expectedOutFile2 = path.join(__dirname,'tmp', 'toCompile2.coffee.globToFiles.js')
-
-      coffeeFun.filesToFiles [ toCompileFile, toCompileFile2 ], generateOutfile, null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
-        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
-        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
-        done()    
-
-    it 'compiles a fileList to a generated filelist',  (done) ->
-      generateOutfile = (inFile) -> "#{inFile}.globToFiles.js"
-      expectedOutFile1 = path.join(__dirname,'tmp', 'toCompile.coffee.globToFiles.js')
-      expectedOutFile2 = path.join(__dirname,'tmp', 'toCompile2.coffee.globToFiles.js')
-
-      coffeeFun.filesToFiles [ toCompileFile, toCompileFile2 ], generateOutfile, null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
-        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
-        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
-        done()    
-
-    it 'compiles a list of files to filelist',  (done) ->
-      outFile1 = path.join(__dirname,'tmp', 'globToFiles5.js')
-      outFile2 = path.join(__dirname,'tmp', 'globToFiles6.js')
-
-      coffeeFun.filesToFiles [ toCompileFile, toCompileFile2 ], [ outFile1 , outFile2 ], null, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ outFile1 , outFile2 ])
-        expect(fs.readFileSync(outFile1, { encoding: 'utf-8'})).to.equal(compiled)
-        expect(fs.readFileSync(outFile2, { encoding: 'utf-8'})).to.equal(compiled2)
-        done()
-
-    it 'returns unexisting file error when a file does not exist', (done) ->
-      outFile1 = path.join(__dirname,'tmp', 'globToFiles9.js')
-      outFile2 = path.join(__dirname,'tmp', 'globToFiles10.js')
-
-      coffeeFun.filesToFiles [ toCompileFile, path.join(__dirname, 'unexisting_file') ], [ outFile1 , outFile2 ], null, (err, result) ->
-        expect(err).to.be.ok
-        expect(err.code).to.equal("ENOENT")
-        expect(err.path).to.equal(path.join(__dirname, 'unexisting_file'))
-        done()
-  ###
 
   describe 'globsToDir', ->
 
@@ -176,19 +74,18 @@ describe 'coffee-fun', ->
       expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
       expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
 
-      coffeeFun.globsToDir '*.coffee', { cwd: basePath }, outputFolder, null, (err, result) ->
+      coffeeFun.glob '*.coffee', { cwd: basePath }, outputFolder, {  }, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         done()
-
     it 'compiles globs to a folder', (done) ->
       outputFolder = path.join(__dirname, 'tmp', 'globsToDir2')
       expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
       expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
 
-      coffeeFun.globsToDir [ '*Compile.coffee', '*2.coffee' ], { cwd: basePath }, outputFolder, null, (err, result) ->
+      coffeeFun.glob [ '*Compile.coffee', '*2.coffee' ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
@@ -200,7 +97,7 @@ describe 'coffee-fun', ->
       expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
       expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
 
-      coffeeFun.globsToDir [ toCompileFileRelative, toCompileFileRelative2 ], { cwd: basePath }, outputFolder, null, (err, result) ->
+      coffeeFun.glob [ toCompileFileRelative, toCompileFileRelative2 ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
@@ -214,12 +111,30 @@ describe 'coffee-fun', ->
       expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
       expectedOutFile3 = path.join(outputFolder, 'subdir', 'toCompile3.coffee.js')
 
-      coffeeFun.globsToDir [ toCompileFileRelative, toCompileFileRelative2, toCompileFileRelative3 ], { cwd: basePath }, outputFolder, null, (err, result) ->
+      coffeeFun.glob [ toCompileFileRelative, toCompileFileRelative2, toCompileFileRelative3 ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
         expect(result).to.eql([ expectedOutFile1, expectedOutFile2, expectedOutFile3 ])
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         expect(fs.readFileSync(expectedOutFile3, { encoding: 'utf-8'})).to.equal(compiled3)
         done()
+
+
+    it 'generates source maps', (done) ->
+      outputFolder = path.join(__dirname, 'tmp', 'globsToDir')
+      expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
+      expectedOutSourceMap1 = path.join(outputFolder, 'maps', 'toCompile.coffee.js.map')
+      expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
+      expectedOutSourceMap2 = path.join(outputFolder, 'maps', 'toCompile2.coffee.js.map')
+
+      coffeeFun.glob '*.coffee', { cwd: basePath }, outputFolder, { sourceMapDir: path.join(outputFolder, 'maps') }, (err, result) ->
+        expect(err).to.be.not.ok
+        expect(result).to.eql([ [expectedOutFile1, expectedOutSourceMap1], [expectedOutFile2, expectedOutSourceMap2] ])
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'}).indexOf(compiled)).to.equal(0)
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'}).indexOf("sourceMappingURL")).to.not.equal(-1)
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'}).indexOf(compiled2)).to.equal(0)
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'}).indexOf("sourceMappingURL")).to.not.equal(-1)
+        done()
+
 
 
