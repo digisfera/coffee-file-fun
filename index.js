@@ -1,7 +1,6 @@
 var coffee = require('coffee-script');
 var fs = require('fs');
 var path = require('path');
-var join = require('path').join;
 var fileFun = require('file-fun');
 var _ = require('lodash');
 
