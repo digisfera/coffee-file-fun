@@ -1,10 +1,10 @@
-var coffee = require('coffee-script');
 var fs = require('fs');
 var path = require('path');
-var filerw = require('file-rw');
-var Args = require('args-js');
-var mirrorGlob = require('mirror-glob');
+var coffee = require('coffee-script');
 var _ = require('lodash');
+var Args = require('args-js');
+var filerw = require('file-rw');
+var mirrorGlob = require('mirror-glob');
 
 relativePath = function(origFilePath, filePathToCalculate) {
   var p = path.relative(path.dirname(origFilePath), filePathToCalculate);
