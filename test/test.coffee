@@ -37,31 +37,21 @@ describe 'coffee-files', ->
       outFile = path.join(__dirname,'tmp', 'fileToFile.js')
       coffeeFiles.file toCompileFile, outFile, null, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.equal(outFile)
+        expect(result).to.eql({ outputFile: outFile, outputData: compiled })
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
         done()
 
     it 'generates a source map', (done) ->
       outFile = path.join(__dirname,'tmp', 'fileToFile2.js')
       outSourceMap = path.join(__dirname,'tmp', 'fileToFile2.js.map')
-      coffeeFiles.file toCompileFile, outFile, { sourceMap: true }, (err, result) ->
-        expect(err).to.be.not.ok
-        expect(result).to.eql([ outFile, outSourceMap ])
-        #expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
-        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
-        expect(fs.readFileSync(outSourceMap, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
-        done()
-
-    it 'generates source map with paths using "/"', (done) ->
-      outFile = path.join(__dirname,'tmp', 'built', 'fileToFile2.js')
-      outSourceMap = path.join(__dirname,'tmp', 'built', 'map', 'fileToFile2.js.map')
       coffeeFiles.file toCompileFile, outFile, { sourceMap: outSourceMap }, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ outFile, outSourceMap ])
-        #expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled)
+        expect(result.outputFile).to.equal(outFile)
+        expect(result.sourceMapFile).to.equal(outSourceMap)
+        expect(result.outputData).to.have.length.greaterThan(0)
+        expect(result.sourceMapData).to.have.length.greaterThan(0)
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
         expect(fs.readFileSync(outSourceMap, { encoding: 'utf-8'})?.length).to.be.greaterThan(0)
-        #TODO: check paths
         done()
 
     it 'should work without `options` argument'
@@ -77,18 +67,23 @@ describe 'coffee-files', ->
 
       coffeeFiles.glob '*.coffee', { cwd: basePath }, outputFolder, {  }, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(result).to.have.length(2)
+        expect(result[0]).to.eql({ outputFile: expectedOutFile1, outputData: compiled })
+        expect(result[1]).to.eql({ outputFile: expectedOutFile2, outputData: compiled2 })
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         done()
-    it 'compiles globs to a folder', (done) ->
+
+    it 'compiles an array of globs to a folder', (done) ->
       outputFolder = path.join(__dirname, 'tmp', 'globsToDir2')
       expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js')
       expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js')
 
       coffeeFiles.glob [ '*Compile.coffee', '*2.coffee' ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(result).to.have.length(2)
+        expect(result[0]).to.eql({ outputFile: expectedOutFile1, outputData: compiled })
+        expect(result[1]).to.eql({ outputFile: expectedOutFile2, outputData: compiled2 })
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         done()
@@ -100,7 +95,9 @@ describe 'coffee-files', ->
 
       coffeeFiles.glob [ toCompileFileRelative, toCompileFileRelative2 ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2 ])
+        expect(result).to.have.length(2)
+        expect(result[0]).to.eql({ outputFile: expectedOutFile1, outputData: compiled })
+        expect(result[1]).to.eql({ outputFile: expectedOutFile2, outputData: compiled2 })
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         done()
@@ -114,7 +111,10 @@ describe 'coffee-files', ->
 
       coffeeFiles.glob [ toCompileFileRelative, toCompileFileRelative2, toCompileFileRelative3 ], { cwd: basePath }, outputFolder, null, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ expectedOutFile1, expectedOutFile2, expectedOutFile3 ])
+        expect(result).to.have.length(3)
+        expect(result[0]).to.eql({ outputFile: expectedOutFile1, outputData: compiled })
+        expect(result[1]).to.eql({ outputFile: expectedOutFile2, outputData: compiled2 })
+        expect(result[2]).to.eql({ outputFile: expectedOutFile3, outputData: compiled3 })
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2)
         expect(fs.readFileSync(expectedOutFile3, { encoding: 'utf-8'})).to.equal(compiled3)
@@ -130,7 +130,12 @@ describe 'coffee-files', ->
 
       coffeeFiles.glob '*.coffee', { cwd: basePath }, outputFolder, { sourceMapDir: path.join(outputFolder, 'maps') }, (err, result) ->
         expect(err).to.be.not.ok
-        expect(result).to.eql([ [expectedOutFile1, expectedOutSourceMap1], [expectedOutFile2, expectedOutSourceMap2] ])
+        expect(result).to.have.length(2)
+        expect(result[0]).to.have.property('outputFile').that.equals(expectedOutFile1)
+        expect(result[0]).to.have.property('sourceMapFile').that.equals(expectedOutSourceMap1)
+        expect(result[0]).to.have.property('outputData').with.length.greaterThan(0)
+        expect(result[0]).to.have.property('sourceMapData').with.length.greaterThan(0)
+
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'}).indexOf(compiled)).to.equal(0)
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'}).indexOf("sourceMappingURL")).to.not.equal(-1)
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'}).indexOf(compiled2)).to.equal(0)

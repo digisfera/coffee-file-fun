@@ -51,10 +51,16 @@ exports.file = function(inputFile, outputFile, options, callback) {
 
 
     if(sourceMapFile && sourceMap)  {
-      filerw.mkWriteFiles([[outputFile, output], [sourceMapFile, sourceMap]], callback)
+      filerw.mkWriteFiles([[outputFile, output], [sourceMapFile, sourceMap]], function(err, result) {
+        if(err) { callback(err); }
+        else { callback(null, { outputFile: outputFile, outputData: output, sourceMapFile: sourceMapFile, sourceMapData: sourceMap}); }
+      })
     }
     else {
-      filerw.mkWriteFile(outputFile, output, callback)
+      filerw.mkWriteFile(outputFile, output, function(err, result) {
+        if(err) { callback(err); }
+        else { callback(null, { outputFile: outputFile, outputData: output }); }
+      });
     }
 
   });
