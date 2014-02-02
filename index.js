@@ -48,7 +48,7 @@ exports.file = function() {
 
     try {
       res = coffee.compile(data, compileOptions);
-    } catch(e) { callback(e); }
+    } catch(e) { return callback(e); }
 
     if(!res) { return callback(new Error("No content after compiling coffee")); }
 
