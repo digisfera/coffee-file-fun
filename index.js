@@ -1,7 +1,9 @@
 var coffee = require('coffee-script');
 var fs = require('fs');
 var path = require('path');
+var filerw = require('file-rw');
 var fileFun = require('file-fun');
+var mirrorGlob = require('mirror-glob');
 var _ = require('lodash');
 
 relativePath = function(origFilePath, filePathToCalculate) {
@@ -49,10 +51,10 @@ exports.file = function(inputFile, outputFile, options, callback) {
 
 
     if(sourceMapFile && sourceMap)  {
-      fileFun.mkWriteFiles([[outputFile, output], [sourceMapFile, sourceMap]], callback)
+      filerw.mkWriteFiles([[outputFile, output], [sourceMapFile, sourceMap]], callback)
     }
     else {
-      fileFun.mkWriteFile(outputFile, output, callback)
+      filerw.mkWriteFile(outputFile, output, callback)
     }
 
   });
@@ -61,11 +63,11 @@ exports.file = function(inputFile, outputFile, options, callback) {
 exports.glob = function(patterns, globOptions, outputDir, options, callback, updateCallback, removeCallback) {
   options = options || {};
 
-  fileFun.glob(patterns, globOptions, outputDir, { extension: 'js', sourceMapDir: options.sourceMapDir, watch: options.watch }, function(inputFile, outputFile, sourceMapFile, cb) {
+  mirrorGlob(patterns, globOptions, outputDir, function(inputFile, outputFile, extraFiles, cb) {
 
     var fileFunOptions = _.omit(options, [ 'sourceMapDir', 'watch' ]);
-    fileFunOptions.sourceMap = sourceMapFile;
+    fileFunOptions.sourceMap = extraFiles.sourceMap;
 
     exports.file(inputFile, outputFile, fileFunOptions, cb);
-  }, callback, updateCallback, removeCallback);
+  }, { extension: 'js', sourceMapDir: options.sourceMapDir, watch: options.watch }, callback, updateCallback, removeCallback);
 }

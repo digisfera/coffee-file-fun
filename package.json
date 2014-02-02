@@ -1,10 +1,10 @@
 {
-  "name": "coffee-file-fun",
+  "name": "coffee-files",
   "version": "0.1.0",
-  "description": "Wrapper functions for the Coffeescript compiler to work with files",
+  "description": "Wrapper functions to compile Coffeescript files",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test"
   },
   "keywords": [
     "coffee",
@@ -14,10 +14,10 @@
     "tu"
   ],
   "author": "Manuel Cabral (m.cabral@digisfera.pt)",
-  "license": "BSD-2-Clause",
+  "license": "MIT",
   "dependencies": {
     "coffee-script": "~1.6.3",
-    "file-fun": "*",
+    "file-rw": "~0.1.0",
     "lodash": "~2.4.1",
     "mkdirp": "~0.3.5"
   },
@@ -29,6 +29,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/digisfera/coffee-file-fun.git"
+    "url": "git://github.com/digisfera/coffee-files.git"
   }
 }
