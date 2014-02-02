@@ -62,8 +62,25 @@ describe('coffee-files', function() {
       });
     });
 
-    it('should work without `options` argument')
-    it('should work without `callback` argument')
+    it('works without `options` argument', function(done) {
+      var outFile = path.join(__dirname,'tmp', 'fileToFileNoOptions.js');
+
+      coffeeFiles.file(toCompileFile, outFile, function(err, result) {
+        expect(err).to.be.not.ok;
+        expect(result).to.eql({ outputFile: outFile, outputData: compiled });
+        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled);
+        done();
+      });
+    })
+    it('works without `callback` argument', function(done) {
+      var outFile = path.join(__dirname,'tmp', 'fileToFileNoCallback.js');
+
+      coffeeFiles.file(toCompileFile, outFile);
+      setTimeout(function() {
+        expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled);
+        done();
+      }, 50);
+    });
 
   });
 
@@ -103,7 +120,7 @@ describe('coffee-files', function() {
     });
 
     it('should mirror directory structure', function(done) {
-      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir4'),
+      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir3'),
           expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js'),
           expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js'),
           expectedOutFile3 = path.join(outputFolder, 'subdir', 'toCompile3.coffee.js');
@@ -123,7 +140,7 @@ describe('coffee-files', function() {
 
 
     it('generates source maps', function(done) {
-      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir'),
+      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir4'),
           expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js'),
           expectedOutSourceMap1 = path.join(outputFolder, 'maps', 'toCompile.coffee.map'),
           expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js'),
@@ -144,5 +161,37 @@ describe('coffee-files', function() {
         done()
       });
     });
+
+    it('works without the `options` argument', function(done) {
+      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir5'),
+          expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js'),
+          expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js');
+
+      coffeeFiles.glob('*.coffee', { cwd: basePath }, outputFolder, function (err, result) {
+        expect(err).to.be.not.ok;
+        expect(result).to.have.length(2);
+        expect(result[0]).to.eql({ outputFile: expectedOutFile1, outputData: compiled });
+        expect(result[1]).to.eql({ outputFile: expectedOutFile2, outputData: compiled2 });
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled);
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2);
+        done();
+      });
+    });
+
+
+    it('works without the `callback` argument', function(done) {
+      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir5'),
+          expectedOutFile1 = path.join(outputFolder, 'toCompile.coffee.js'),
+          expectedOutFile2 = path.join(outputFolder, 'toCompile2.coffee.js');
+
+      coffeeFiles.glob('*.coffee', basePath, outputFolder);
+
+      setTimeout(function() {
+        expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled);
+        expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2);
+        done();
+      });
+    });
+
   });
 });

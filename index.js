@@ -2,7 +2,7 @@ var coffee = require('coffee-script');
 var fs = require('fs');
 var path = require('path');
 var filerw = require('file-rw');
-var fileFun = require('file-fun');
+var Args = require('args-js');
 var mirrorGlob = require('mirror-glob');
 var _ = require('lodash');
 
@@ -11,8 +11,20 @@ relativePath = function(origFilePath, filePathToCalculate) {
   return p.split(path.sep).join('/');
 }
 
-exports.file = function(inputFile, outputFile, options, callback) {
-  options = options || {};
+exports.file = function() {
+
+  args = Args([
+    { inputFile:  Args.STRING | Args.Required },
+    { outputFile:  Args.STRING | Args.Required },
+    { options: Args.OBJECT | Args.Optional, _default: {} },
+    { callback: Args.FUNCTION | Args.Optional, _default: function() {} }
+  ], arguments)
+
+  var inputFile = args.inputFile,
+      outputFile = args.outputFile,
+      options = args.options,
+      callback = args.callback;
+
 
   var sourceMapFile = null;
   if(options.sourceMap === true) {
@@ -66,8 +78,24 @@ exports.file = function(inputFile, outputFile, options, callback) {
   });
 }
 
-exports.glob = function(patterns, globOptions, outputDir, options, callback, updateCallback, removeCallback) {
-  options = options || {};
+exports.glob = function() {
+  args = Args([
+    { patterns:  Args.ANY | Args.Required },
+    { globOptions: Args.ANY | Args.Required },
+    { outputDir: Args.STRING | Args.Required },
+    { options: Args.OBJECT | Args.Optional, _default: {} },
+    { callback: Args.FUNCTION | Args.Optional, _default: function() {} },
+    { updateCallback: Args.FUNCTION | Args.Optional, _default: function() {} },
+    { removeCallback: Args.FUNCTION | Args.Optional, _default: function() {} }
+  ], arguments)
+
+  var patterns = args.patterns,
+      globOptions = args.globOptions,
+      outputDir = args.outputDir,
+      options = args.options,
+      callback = args.callback,
+      updateCallback = args.updateCallback,
+      removeCallback = args.removeCallback;
 
   mirrorGlob(patterns, globOptions, outputDir, function(inputFile, outputFile, extraFiles, cb) {
 
