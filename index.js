@@ -37,6 +37,8 @@ exports.file = function() {
 
   fs.readFile(inputFile, { encoding: 'utf-8' }, function(err, data) {
 
+    if(err) { return callback(err); }
+
     var compileOptions = _.clone(options);
     // We can receive a string for the output file, but coffee.compile is expecting just a boolean value
     if(compileOptions.sourceMap) { compileOptions.sourceMap = true; }
@@ -48,7 +50,11 @@ exports.file = function() {
 
     try {
       res = coffee.compile(data, compileOptions);
-    } catch(e) { return callback(e); }
+    } catch(e) {
+      e.filename = path.basename(inputFile);
+      e.stack = e.toString();
+      return callback(e);
+    }
 
     if(!res) { return callback(new Error("No content after compiling coffee")); }
 

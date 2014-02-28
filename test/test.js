@@ -11,6 +11,7 @@ describe('coffee-files', function() {
   var toCompile = "0 < x < 1",
       toCompile2 = "0 < x < 2",
       toCompile3 = "0 < x < 3",
+      toCompileInvalid = "0 < x < ",
       compiled = coffee.compile(toCompile),
       compiled2 = coffee.compile(toCompile2),
       compiled3 = coffee.compile(toCompile3),
@@ -18,6 +19,7 @@ describe('coffee-files', function() {
       toCompileFile = path.join(basePath,'toCompile.coffee'),
       toCompileFile2 = path.join(basePath,'toCompile2.coffee'),
       toCompileFile3 = path.join(basePath,'subdir','toCompile3.coffee'),
+      toCompileFileInvalid = path.join(basePath,'subdir','toCompileInvalid.coffee'),
       toCompileFileRelative = 'toCompile.coffee',
       toCompileFileRelative2 = 'toCompile2.coffee',
       toCompileFileRelative3 = path.join('subdir','toCompile3.coffee');
@@ -29,6 +31,7 @@ describe('coffee-files', function() {
       fs.writeFileSync(toCompileFile, toCompile);
       fs.writeFileSync(toCompileFile2, toCompile2);
       fs.writeFileSync(toCompileFile3, toCompile3);
+      fs.writeFileSync(toCompileFileInvalid, toCompileInvalid);
       done();
     });
   });
@@ -80,6 +83,30 @@ describe('coffee-files', function() {
         expect(fs.readFileSync(outFile, { encoding: 'utf-8'})).to.equal(compiled);
         done();
       }, 50);
+    });
+
+    it('returns error on invalid code', function(done) {
+      var outFile = path.join(__dirname,'tmp', 'fileToFileInvalid.js');
+
+      coffeeFiles.file(toCompileFileInvalid, outFile, null, function(err, result) {
+        expect(err).to.be.ok;
+        //console.log(err);
+        //console.log(err.toString());
+        expect(fs.existsSync(path)).to.equal(false);
+        done();
+      });
+    });
+
+    it('returns error if file does not exist', function(done) {
+      var outFile = path.join(__dirname,'tmp', 'fileToFileUnexisting.js');
+
+      coffeeFiles.file('fileToFileUnexisting.js', outFile, null, function(err, result) {
+        expect(err).to.be.ok;
+        //console.log(err);
+        //console.log(err.toString());
+        expect(fs.existsSync(path)).to.equal(false);
+        done();
+      });
     });
 
   });
@@ -189,6 +216,18 @@ describe('coffee-files', function() {
       setTimeout(function() {
         expect(fs.readFileSync(expectedOutFile1, { encoding: 'utf-8'})).to.equal(compiled);
         expect(fs.readFileSync(expectedOutFile2, { encoding: 'utf-8'})).to.equal(compiled2);
+        done();
+      });
+    });
+
+    it('returns error on invalid code', function(done) {
+      var outputFolder = path.join(__dirname, 'tmp', 'globsToDir6'),
+          expectedOutFileNotWritten = path.join(outputFolder, 'toCompileInvalid.coffee.js');
+
+      coffeeFiles.glob('subdir/*.coffee', { cwd: basePath }, outputFolder, {  }, function (err, result) {
+        expect(err).to.be.ok;
+        //console.log(err);
+        //console.log(err.toString());
         done();
       });
     });

@@ -16,7 +16,7 @@
   "author": "Manuel Cabral (m.cabral@digisfera.pt)",
   "license": "MIT",
   "dependencies": {
-    "coffee-script": "~1.6.3",
+    "coffee-script": "~1.7.1",
     "file-rw": "~0.1.0",
     "lodash": "~2.4.1",
     "mkdirp": "~0.3.5",
