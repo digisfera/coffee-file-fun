@@ -1,6 +1,6 @@
 {
   "name": "coffee-files",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Wrapper functions to compile Coffeescript files",
   "main": "index.js",
   "scripts": {
